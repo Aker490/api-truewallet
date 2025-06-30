@@ -1,13 +1,14 @@
 const fetch = require('axios');
 const tls = require("tls");
-require('dotenv').config();
+const env = require('dotenv');
+env.config();
 
 tls.DEFAULT_MIN_VERSION = "TLSv1.3";
 
 module.exports = {
     redeemvouchers: async function (voucher_code) {
-        voucher_code = voucher_code.replace('https://gift.truemoney.com/campaign/?v=', '');
-
+        //voucher_code = voucher_code.replace('https://gift.truemoney.com/campaign/?v=','');
+        
         if (!/^[a-z0-9]*$/i.test(voucher_code)) {
             return {
                 status: 'FAIL',
@@ -15,14 +16,14 @@ module.exports = {
             };
         }
 
-        if (voucher_code.length !== 36) {
+        if (voucher_code.length <= 0) {
             return {
                 status: 'FAIL',
-                reason: 'Voucher code format is invalid.'
+                reason: 'Voucher code cannot be empty.'
             };
         }
 
-        const phone_number = process.env.REDEEM_PHONE;
+        const phone_number = process.env.PHONE_NUMBER || '';
 
         const data = {
             mobile: phone_number,
@@ -44,6 +45,7 @@ module.exports = {
                 }
             );
 
+
             const resjson = response?.data;
 
             if (resjson?.status?.code === 'SUCCESS') {
@@ -59,6 +61,7 @@ module.exports = {
             }
 
         } catch (err) {
+            // Handle network or unexpected errors
             return {
                 status: 'FAIL',
                 reason: err?.response?.data?.status?.message || err.message || 'Unexpected error occurred.'
