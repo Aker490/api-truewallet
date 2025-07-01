@@ -3,9 +3,19 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const { redeemvouchers } = require('./truewallet.js');
+require('dotenv').config();
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// 🔐 Middleware ตรวจสอบ API Key
+app.use((req, res, next) => {
+  const token = req.headers['x-api-key'];
+  if (!token || token !== process.env.API_KEY) {
+    return res.status(403).json({ status: 'FAIL', reason: 'Invalid API key' });
+  }
+  next();
+});
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
