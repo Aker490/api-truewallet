@@ -8,6 +8,10 @@ require('dotenv').config();
 app.use(cors());
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+})
+
 // 🔐 Middleware ตรวจสอบ API Key
 app.use((req, res, next) => {
   const token = req.headers['x-api-key'];
@@ -16,10 +20,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-})
 
 app.post('/redeem', async (req, res) => {
     const { code } = req.body;
